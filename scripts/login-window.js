@@ -19,7 +19,9 @@ registerButton.addEventListener('click', function(e){
     document.location.href="registerWindow.html";
 });
 
+var loginButton = document.getElementById('loginButton');
 var togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
+
 
 togglePasswordVisibility.addEventListener('click', function(e){
     e.preventDefault();
@@ -36,6 +38,21 @@ togglePasswordVisibility.addEventListener('click', function(e){
         open_eye.classList.add('hide');
         passwordField.type = 'text';
     }
+});
+
+loginButton.addEventListener('click', function(e){
+    e.preventDefault();
+    var emailField = document.getElementById('email').value;
+    var passwordField = document.getElementById('password').value;
+
+    firebase.auth().signInWithEmailAndPassword(emailField, passwordField).then(function(){
+        document.location.href="mainWindow.html";
+    }).catch(function(error){
+        if(error != null){
+            console.log(error.message);
+            return;
+        }
+    });
 });
 
 const isProduction = require('electron-is-running-in-asar');

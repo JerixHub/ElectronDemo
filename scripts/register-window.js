@@ -2,6 +2,9 @@ const electron = require('electron');
 const { ipcRenderer } = electron;
 const form = document.querySelector('form');
 const path = require('path');
+var firebase = require("firebase/app");
+require("firebase/database");
+require("firebase/auth");
 
 // Initialize Firebase
 var config = {
@@ -13,6 +16,7 @@ var config = {
     messagingSenderId: "1026235558917"
   };
 firebase.initializeApp(config);
+
 
 var registerButton = document.getElementById('registerButton');
 var loginButton = document.getElementById('loginButton');
@@ -41,7 +45,9 @@ registerButton.addEventListener('click', function(e){
     var passwordField = document.getElementById('password').value;
     var fullnameField = document.getElementById('fullname').value;
 
-    firebase.auth().createUserWithEmailAndPassword(emailField, passwordField).then(function(){
+    firebase.auth().createUserWithEmailAndPassword(emailField, passwordField).then(userCredentials => {
+        var userData = userCredentials.user;
+        createNewUser(emailField, fullnameField, userData.uid);
         Swal.fire({
             title: 'Good job!',
             text: 'Do you want to login directly?',
@@ -69,6 +75,25 @@ registerButton.addEventListener('click', function(e){
     });
 });
 
+function createNewUser(email, fullname, uid){
+    firebase.database().ref('users/' + uid ).set({
+        email: email,
+        fullname: fullname
+    }, function(error){
+        if(error != null){
+            console.log(error.message);
+            return;
+        }else{
+            console.log('saved!');
+        }
+    });
+}
+
 loginButton.addEventListener('click', function(){
     document.location.href="loginWindow.html";
+});
+
+$(document).on('dblclick','body',(e) => {
+    console.log('double clicked!');
+    ipcRenderer.send('general:double-click',null);
 });
