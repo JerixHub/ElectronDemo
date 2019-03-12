@@ -10,6 +10,7 @@ process.env.NODE_ENV = 'production';
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 let mainWindow;
 let loginWindow;
+let registerWindow;
 let profileWindow;
 let settingsWindow;
 let previewWindow;
@@ -54,10 +55,9 @@ const store = new Store({
 });
 // Listen for app to be ready
 app.on('ready', () => {
-
-
     // createMainWindow();
     createLoginWindow();
+    
 });
 app.on('Window-all-closed', () => {
     app.quit();
@@ -111,6 +111,25 @@ function createLoginWindow() {
             app.quit();
         }
     });
+}
+/*----------------------------------------*
+ *              REGISTER WINDOW           *
+ *----------------------------------------*/
+function createRegisterWindow() {
+    registerWindow = new BrowserWindow({ fullscreen: fullscreen, icon: path.join(__dirname, '../images/teeth-icon.png') });
+    registerWindow.loadURL(url.format({
+        pathname: path.join(__dirname, '../windows/registerWindow.html'),
+        protocol: 'file',
+        slashes: true
+    }));
+    registerWindow.setMenuBarVisibility(false);
+    registerWindow.on('close', () => {
+        registerWindow = null;
+        if (mainWindow == null && loginWindow == null && profileWindow == null && settingsWindow == null && previewWindow == null && registerWindow == null){
+            app.quit();
+        }
+    });
+
 }
 /*----------------------------------------*
  *              PROFILE WINDOW            *

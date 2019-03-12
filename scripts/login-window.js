@@ -1,66 +1,53 @@
 const electron = require('electron');
 const { ipcRenderer } = electron;
-const form = document.querySelector('form');
 const path = require('path');
-// Database
-var Datastore = require('nedb');
-var dbpath;
+const url = require('url');
+const BrowserWindow = require('electron').remote.BrowserWindow;
+
+var config = {
+    apiKey: "AIzaSyCZ9jutSoUMj2znaZUc_oL84dLHY3YVmPA",
+    authDomain: "dentistapp-b56b9.firebaseapp.com",
+    databaseURL: "https://dentistapp-b56b9.firebaseio.com",
+    projectId: "dentistapp-b56b9",
+    storageBucket: "dentistapp-b56b9.appspot.com",
+    messagingSenderId: "1026235558917"
+  };
+firebase.initializeApp(config);
+
+const registerButton = document.getElementById('registerButton');
+registerButton.addEventListener('click', function(e){
+    document.location.href="registerWindow.html";
+});
+
+var togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
+
+togglePasswordVisibility.addEventListener('click', function(e){
+    e.preventDefault();
+    var open_eye = document.getElementById('open-eye');
+    var close_eye = document.getElementById('close-eye');
+    var passwordField = document.getElementById('password');
+
+    if(open_eye.classList.contains('hide')){
+        open_eye.classList.remove('hide');
+        close_eye.classList.add('hide');
+        passwordField.type = 'password';
+    }else{
+        close_eye.classList.remove('hide');
+        open_eye.classList.add('hide');
+        passwordField.type = 'text';
+    }
+});
 
 const isProduction = require('electron-is-running-in-asar');
 if(isProduction()) {
-    /*----------          location on outside folder dentistapp-win32-ia32  --------------*/
-        dbpath = path.join(__dirname,'../../../../db/user.db');
-    } else {
-        dbpath = path.join(__dirname,'../scripts/user_db');
-    }
-    var db = new Datastore({filename: dbpath, autoload:true });
 
-    var item = ' loginWindow';
-    // add submit function
-    form.addEventListener('submit', submitForm );
-
-
-
-    function submitForm(e){
-        e.preventDefault();
-        var username = $('#username').val();
-        var password = $('#password').val();
-        console.log('Entered username & password: ' + username +''+password);
-        // stored data
-        // var admin;// =dataArray[0];
-        // var encrypted_pw;// = dataArray[1];
-        var admin = '';
-        var pw = '';
-        db.find({}, function(err, docs){
-            admin = docs[0]['username'];
-            console.log('admin: ' + admin);
-            // encrypted_pw = docs[0]['password'];
-            // var pwBytes = CryptoJS.AES.decrypt(encrypted_pw, 'DentalApp');
-            // console.log('encrypted_pw: ' + encrypted_pw);
-            // pw = pwBytes.toString(CryptoJS.enc.Utf8);
-            pw = docs[0]['password'];
-            console.log('pw: ' + pw);
-            login(username,password,admin,pw);
-        });
-    } // end submit
-function login(uname, pword ,dbadmin, dbpassword) {
-    $('span.validation').html = '';
-        // var encrypted = CryptoJS.AES.encrypt(password, 'DentalApp');
-        if( uname == dbadmin && pword == dbpassword ) {
-
-            ipcRenderer.send('login:submit', item);
-
-        } else {
-            $('span.validation').html('Username or Password is incorrect.');
-        }
 }
-// double click toggle fullscreen
+
 $(document).on('dblclick','body',(e) => {
     console.log('double clicked!');
     ipcRenderer.send('general:double-click',null);
- });
+});
 
-
-    $(document).ready(() => {
-        $('#username').focus();
-     });
+$(document).ready(() => {
+    $('#email').focus();
+});
